@@ -2,16 +2,18 @@ import {
   Body,
   Controller,
   Delete,
-  Get, HttpStatus,
+  Get,
+  HttpStatus,
   Post,
   Put,
-  Query, Res,
+  Query,
+  Res,
 } from '@nestjs/common';
 import { CreateUserDto, CreateUserResponse } from './Dtos/create-dtos';
 import { v4 as uuidv4 } from 'uuid';
 import { Response } from 'express';
-@Controller('basic')
-export class BasicController {
+@Controller('users')
+export class UsersController {
   private static users: CreateUserDto[] = [
     {
       id: uuidv4(),
@@ -28,24 +30,24 @@ export class BasicController {
   ];
   @Get()
   getUsers(@Res() res: Response) {
-    res.status(HttpStatus.FOUND).json(BasicController.users);
+    res.status(HttpStatus.FOUND).json(UsersController.users);
   }
 
   @Post()
   create(@Body() createUserDtos: CreateUserDto, @Res() res: Response) {
-    BasicController.users.push(createUserDtos); // for scope
+    UsersController.users.push(createUserDtos); // for scope
     // let res: CreateUserResponse;
     // eslint-disable-next-line prefer-const
     const response = {
       message: 'User created successfully.',
-      totalUsers: BasicController.users.length, // for scope
+      totalUsers: UsersController.users.length, // for scope
     };
     res.status(HttpStatus.CREATED).json(response);
   }
   @Put()
   updateUsers(@Body() updateUserDto: CreateUserDto, @Res() res: Response) {
     console.log('filtering user based on id');
-    const createUserDtos = BasicController.users.filter(
+    const createUserDtos = UsersController.users.filter(
       (user) => user.username === updateUserDto.id,
     );
     console.log('Updating user');
@@ -60,15 +62,15 @@ export class BasicController {
   }
   @Delete()
   deletUser(@Query('id') id: string) {
-    const index = BasicController.users.findIndex((user) => user.id === id);
+    const index = UsersController.users.findIndex((user) => user.id === id);
     console.log(
       'Items before deleting',
-      BasicController.users.length.toFixed(),
+      UsersController.users.length.toFixed(),
     );
     if (index > -1) {
       console.log('item found');
-      BasicController.users.splice(index, 1);
+      UsersController.users.splice(index, 1);
     }
-    console.log('Items after deleting', BasicController.users.length.toFixed());
+    console.log('Items after deleting', UsersController.users.length.toFixed());
   }
 }
