@@ -2,13 +2,14 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, HttpStatus,
   Post,
   Put,
-  Query,
+  Query, Res,
 } from '@nestjs/common';
 import { CreateUserDto, CreateUserResponse } from './Dtos/create-dtos';
 import { v4 as uuidv4 } from 'uuid';
+import { Response } from 'express';
 @Controller('basic')
 export class BasicController {
   private static users: CreateUserDto[] = [
@@ -26,23 +27,23 @@ export class BasicController {
     },
   ];
   @Get()
-  getUsers() {
-    return BasicController.users; // for scope
+  getUsers(@Res() res: Response) {
+    res.status(HttpStatus.FOUND).json(BasicController.users);
   }
 
   @Post()
-  create(@Body() createUserDtos: CreateUserDto) {
+  create(@Body() createUserDtos: CreateUserDto, @Res() res: Response) {
     BasicController.users.push(createUserDtos); // for scope
-    let res: CreateUserResponse;
+    // let res: CreateUserResponse;
     // eslint-disable-next-line prefer-const
-    res = {
+    const response = {
       message: 'User created successfully.',
       totalUsers: BasicController.users.length, // for scope
     };
-    return res;
+    res.status(HttpStatus.CREATED).json(response);
   }
   @Put()
-  updateUsers(@Body() updateUserDto: CreateUserDto) {
+  updateUsers(@Body() updateUserDto: CreateUserDto, @Res() res: Response) {
     console.log('filtering user based on id');
     const createUserDtos = BasicController.users.filter(
       (user) => user.username === updateUserDto.id,
@@ -53,7 +54,9 @@ export class BasicController {
       user.email = updateUserDto.email;
       user.password = updateUserDto.password;
     });
-    return 'Total updated user' + createUserDtos.length + 1;
+    res
+      .status(HttpStatus.CREATED)
+      .send('Total updated user' + createUserDtos.length + 1);
   }
   @Delete()
   deletUser(@Query('id') id: string) {
