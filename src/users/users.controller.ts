@@ -3,7 +3,8 @@ import {
   Controller,
   Delete,
   Get,
-  HttpStatus, Param,
+  HttpStatus,
+  Param,
   Post,
   Put,
   Query,
@@ -12,28 +13,32 @@ import {
 import { Response } from 'express';
 import { UsersService } from './users.service';
 import { UserDto } from './Dtos/create-dtos';
+import { ApiCreatedResponse } from '@nestjs/swagger';
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {
-  }
+  constructor(private usersService: UsersService) {}
   @Get()
+  @ApiCreatedResponse({ type: [UserDto] })
   getUsers(@Res() res: Response) {
     const userDtos = this.usersService.fetchUsers();
     res.status(HttpStatus.OK).json(userDtos);
   }
 
   @Get(':id')
+  @ApiCreatedResponse({ type: UserDto })
   getUser(@Param('id') id: string, @Res() res: Response) {
     const userDtos = this.usersService.fetchUser(id);
     res.status(HttpStatus.OK).json(userDtos);
   }
 
   @Post()
+  @ApiCreatedResponse({ type: String })
   create(@Body() createUserDtos: UserDto, @Res() res: Response) {
     const createdUserId = this.usersService.createUser(createUserDtos);
     res.status(HttpStatus.OK).json('User created with id - ' + createdUserId);
   }
   @Put()
+  @ApiCreatedResponse({ type: String })
   updateUsers(@Body() updateUserDto: UserDto, @Res() res: Response) {
     const isUpdated = this.usersService.updateUser(updateUserDto);
     if (isUpdated) {
@@ -41,6 +46,7 @@ export class UsersController {
     }
   }
   @Delete()
+  @ApiCreatedResponse({ type: String })
   deletUser(@Query('id') id: string, @Res() res: Response) {
     const isDeleted = this.usersService.deleteUser(id);
     if (isDeleted) {
