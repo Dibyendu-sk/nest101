@@ -7,8 +7,8 @@ export class UsersService {
   fetchUsers(): UserDto[] {
     return this.users;
   }
-  fetchUser(id: string): UserDto[] {
-    return this.users.filter((u) => u.id === id);
+  fetchUser(id: string): UserDto {
+    return <UserDto>this.users.find((u) => u.id === id);
   }
   createUser(userDto: UserDto) {
     userDto.id = uuidv4();

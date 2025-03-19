@@ -2,8 +2,9 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
+  Get, HttpException,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -13,7 +14,7 @@ import {
 import { Response } from 'express';
 import { UsersService } from './users.service';
 import { UserDto } from './Dtos/create-dtos';
-import { ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
@@ -26,9 +27,13 @@ export class UsersController {
 
   @Get(':id')
   @ApiCreatedResponse({ type: UserDto })
+  @ApiNotFoundResponse()
   getUser(@Param('id') id: string, @Res() res: Response) {
-    const userDtos = this.usersService.fetchUser(id);
-    res.status(HttpStatus.OK).json(userDtos);
+    const user = this.usersService.fetchUser(id);
+    if (!user) {
+      throw new HttpException('user Not Found', HttpStatus.NOT_FOUND);
+    }
+    res.status(HttpStatus.OK).json(user);
   }
 
   @Post()
